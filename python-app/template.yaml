@@ -21,7 +21,7 @@ spec:
           type: string
           description: Unique name of the component
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)(-[a-zA-Z0-9]+)*$'
-        environment:
+        enviroment:
           title: Enviroment
           type: string
           description: The enviroment of this component
@@ -36,7 +36,7 @@ spec:
         url: ./template
         values:
           app_name: ${{parameters.component_id}}
-          app_env: ${{parameters.environment}}
+          app_env: ${{parameters.enviroment}}
 
     - id: publish
       name: Publish
