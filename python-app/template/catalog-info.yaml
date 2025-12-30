@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{values.app_name}}
+  description: Aplicação Python que mostra o host e as horas, chamado ${{values.app_name}}
+  annotations:
+    github.com/project-slug: mgsantos89/${{values.app_name}}
+spec:
+  type: service
+  owner: development
+  lifecycle: experimental
