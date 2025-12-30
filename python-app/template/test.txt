@@ -1,0 +1,5 @@
+Ola, esse é um arquivo de teste.
+
+O nome do app é ${{values.app_name}}
+
+O ambiente do app é ${{values.app_env}}
