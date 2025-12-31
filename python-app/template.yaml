@@ -43,7 +43,7 @@ spec:
       action: publish:github
       input:
         description: This is ${{ parameters.component_id }}
-        repoUrl: github.com?owner=mgsantos89&repo=${{parameters.component_id}}
+        repoUrl: github.com?owner=MgtecnoInfoCloud&repo=${{parameters.component_id}}
         protectDefaultBranch: false
         repoVisibility: public
 
