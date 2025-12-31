@@ -1,1 +1,5 @@
 replicaCount: 1
+image:
+  repository: mgsantos89/${{values.app_name}}
+  pullPolicy: IfNotPresent
+  tag: ${{values.app_name}}-${{values.app_env}}-latest
