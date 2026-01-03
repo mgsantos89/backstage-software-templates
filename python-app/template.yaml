@@ -224,3 +224,91 @@ spec:
       action: debug:log 
       input:
         extra: "Solicitação para o Kibana enviada."
+---
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: allow-ip
+  title: Autorizar IP - WAF 
+spec:
+  type: AWS
+  owner: development
+  
+  parameters:
+    - title: Dados do Novo Usuário
+      properties:
+        username:
+          type: string
+          title: "ID do Usuário (ex: nome.sobrenome)"
+        email:
+          type: string
+          title: E-mail
+        role:
+          type: string
+          title: Perfil de Acesso
+          enum: [viewer, editor, admin]
+          enumNames: ["Apenas Visualização", "Editor de Dashboards", "Administrador"]
+
+  steps:
+    - id: disparar-n8n-kibana
+      name: Enviando solicitação ao n8n
+      action: http:backstage:request
+      input:
+        method: 'POST'
+        url: 'https://seu-n8n.com/webhooks/kibana-provisioning'
+        headers:
+          Content-Type: 'application/json'
+        body:
+          username: ${{ parameters.username }}
+          email: ${{ parameters.email }}
+          role: ${{ parameters.role }}
+
+    - id: log-final
+      name: Concluído
+      action: debug:log 
+      input:
+        extra: "Solicitação para o Kibana enviada."
+---
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: block-ip
+  title: Bloquear IP - WAF 
+spec:
+  type: AWS
+  owner: development
+  
+  parameters:
+    - title: Dados do Novo Usuário
+      properties:
+        username:
+          type: string
+          title: "ID do Usuário (ex: nome.sobrenome)"
+        email:
+          type: string
+          title: E-mail
+        role:
+          type: string
+          title: Perfil de Acesso
+          enum: [viewer, editor, admin]
+          enumNames: ["Apenas Visualização", "Editor de Dashboards", "Administrador"]
+
+  steps:
+    - id: disparar-n8n-kibana
+      name: Enviando solicitação ao n8n
+      action: http:backstage:request
+      input:
+        method: 'POST'
+        url: 'https://seu-n8n.com/webhooks/kibana-provisioning'
+        headers:
+          Content-Type: 'application/json'
+        body:
+          username: ${{ parameters.username }}
+          email: ${{ parameters.email }}
+          role: ${{ parameters.role }}
+
+    - id: log-final
+      name: Concluído
+      action: debug:log 
+      input:
+        extra: "Solicitação para o Kibana enviada."
