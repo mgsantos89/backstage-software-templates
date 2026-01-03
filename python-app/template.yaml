@@ -195,7 +195,7 @@ spec:
       properties:
         username:
           type: string
-          title: ID do Usuário (ex: nome.sobrenome)
+          title: "ID do Usuário (ex: nome.sobrenome)"
         email:
           type: string
           title: E-mail
