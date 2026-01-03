@@ -64,48 +64,40 @@ kind: Template
 metadata:
   name: provisionar-sql-user
   title: Novo Usuário SQL Server
-  description: Provisionamento de acesso ao SQL Server via automação n8n.
 spec:
   type: credential
   owner: user:guest
   
   parameters:
-    - title: Dados do Usuário
+    - title: Configuração de Acesso
       properties:
         username:
           type: string
           title: Nome do Usuário
-          ui:autofocus: true
-
-    - title: Seleção de Produto
-      properties:
         produto:
           type: string
           title: Em qual produto você deseja acesso?
           enum: [produto_a, produto_b]
           enumNames: ["Produto Alpha", "Produto Bravo"]
-
-    - title: Seleção de Banco de Dados (Alpha)
-      if:
-        properties:
-          produto:
-            const: produto_a
-      properties:
-        database:
+        
+        # Campo Alpha
+        database_alpha:
           type: string
           title: Database do Produto Alpha
           enum: [db_alpha_prod, db_alpha_homolog]
+          ui:options:
+            # Esta é a sintaxe que o Backstage usa para esconder campos dinamicamente
+            # Se o produto NÃO for produto_a, o campo fica escondido
+            hideIf: "{{ parameters.produto !== 'produto_a' }}"
 
-    - title: Seleção de Banco de Dados (Bravo)
-      if:
-        properties:
-          produto:
-            const: produto_b
-      properties:
-        database:
+        # Campo Bravo
+        database_bravo:
           type: string
           title: Database do Produto Bravo
           enum: [db_bravo_sales, db_bravo_stock]
+          ui:options:
+            # Se o produto NÃO for produto_b, o campo fica escondido
+            hideIf: "{{ parameters.produto !== 'produto_b' }}"
 
   steps:
     - id: disparar-n8n
@@ -119,10 +111,11 @@ spec:
         body:
           username: ${{ parameters.username }}
           produto: ${{ parameters.produto }}
-          database: ${{ parameters.database }}
+          # Aqui enviamos o valor do campo que não está escondido
+          database: ${{ parameters.database_alpha if parameters.produto == 'produto_a' else parameters.database_bravo }}
 
     - id: log-final
       name: Concluído
       action: debug:log
       input:
-        extra: "A solicitação para o banco ${{ parameters.database }} foi enviada."
+        extra: "Solicitação enviada."
