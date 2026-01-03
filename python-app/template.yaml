@@ -185,7 +185,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: provisionar-kibana-user
-  title: Acesso - Kibana/Elasticsearch
+  title: Acesso - Kibana
 spec:
   type: credential
   owner: development
