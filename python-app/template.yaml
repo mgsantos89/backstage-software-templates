@@ -67,7 +67,7 @@ metadata:
 spec:
   type: credential
   parameters:
-    - title: Seleção de Produto
+    - title: Seleção de Ambiente
       properties:
         produto:
           type: string
@@ -78,33 +78,28 @@ spec:
           enumNames:
             - "Produto Alpha"
             - "Produto Bravo"
-    
-    # Aqui começa a mágica da condicional
-    - title: Seleção de Banco de Dados
+      
+      # A mágica acontece aqui dentro do mesmo bloco de propriedades
       dependencies:
-        produto:
-          # Se o valor de 'produto' for 'produto_a'
-          produto_a:
-            properties:
-              database:
-                type: string
-                title: Database do Produto Alpha
-                enum: [db_alpha_prod, db_alpha_homolog]
-          # Se o valor de 'produto' for 'produto_b'
-          produto_b:
-            properties:
-              database:
-                type: string
-                title: Database do Produto Bravo
-                enum: [db_bravo_sales, db_bravo_stock]
-  
-  steps:
-    - id: call-n8n
-      name: Enviando para o n8n
-      action: http:backstage:request
-      input:
-        method: 'POST'
-        url: 'https://seu-n8n.com/webhooks/...'
-        body:
-          produto: ${{ parameters.produto }}
-          database: ${{ parameters.database }}
+        produto: # O campo que estamos observando
+          oneOf:
+            - properties:
+                produto:
+                  enum:
+                    - produto_a
+                database:
+                  type: string
+                  title: Database do Produto Alpha (SQL Server)
+                  enum:
+                    - db_alpha_prod
+                    - db_alpha_homolog
+            - properties:
+                produto:
+                  enum:
+                    - produto_b
+                database:
+                  type: string
+                  title: Database do Produto Bravo (SQL Server)
+                  enum:
+                    - db_bravo_sales
+                    - db_bravo_stock
