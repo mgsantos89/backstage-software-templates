@@ -59,7 +59,7 @@ spec:
       - title: Repository
         url: ${{ steps['publish'].output.remoteUrl }}
 ---
-piVersion: backstage.io/v1beta3
+apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: provisionar-sql-user
