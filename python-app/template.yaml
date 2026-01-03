@@ -78,28 +78,25 @@ spec:
           enumNames:
             - "Produto Alpha"
             - "Produto Bravo"
-      
-      # A mágica acontece aqui dentro do mesmo bloco de propriedades
-      dependencies:
-        produto: # O campo que estamos observando
-          oneOf:
-            - properties:
-                produto:
-                  enum:
-                    - produto_a
-                database:
-                  type: string
-                  title: Database do Produto Alpha (SQL Server)
-                  enum:
-                    - db_alpha_prod
-                    - db_alpha_homolog
-            - properties:
-                produto:
-                  enum:
-                    - produto_b
-                database:
-                  type: string
-                  title: Database do Produto Bravo (SQL Server)
-                  enum:
-                    - db_bravo_sales
-                    - db_bravo_stock
+        
+        # Campo para o Produto A
+        database_alpha:
+          type: string
+          title: Database do Produto Alpha (SQL Server)
+          enum:
+            - db_alpha_prod
+            - db_alpha_homolog
+          ui:options:
+            dependencies:
+              produto: ['produto_a'] # Só aparece se produto for produto_a
+
+        # Campo para o Produto B
+        database_bravo:
+          type: string
+          title: Database do Produto Bravo (SQL Server)
+          enum:
+            - db_bravo_sales
+            - db_bravo_stock
+          ui:options:
+            dependencies:
+              produto: ['produto_b'] # Só aparece se produto for produto_b
