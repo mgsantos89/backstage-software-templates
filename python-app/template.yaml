@@ -63,10 +63,10 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: provisionar-sql-user
-  title: Novo Usuário SQL Server
+  title: Acesso BD - Gestão de Frotas
 spec:
   type: credential
-  owner: user:guest
+  owner: development
   
   parameters:
     - title: Configuração de Acesso
@@ -116,6 +116,68 @@ spec:
 
     - id: log-final
       name: Concluído
-      action: debug:log
+      action: debug:log 
+      input:
+        extra: "Solicitação enviada."
+---
+---
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: provisionar-sql-user
+  title: Acesso BD - Bank/Logistica
+spec:
+  type: credential
+  owner: development
+  
+  parameters:
+    - title: Configuração de Acesso
+      properties:
+        username:
+          type: string
+          title: Nome do Usuário
+        produto:
+          type: string
+          title: Em qual produto você deseja acesso?
+          enum: [produto_a, produto_b]
+          enumNames: ["Produto Alpha", "Produto Bravo"]
+        
+        # Campo Alpha
+        database_alpha:
+          type: string
+          title: Database do Produto Alpha
+          enum: [db_alpha_prod, db_alpha_homolog]
+          ui:options:
+            # Esta é a sintaxe que o Backstage usa para esconder campos dinamicamente
+            # Se o produto NÃO for produto_a, o campo fica escondido
+            hideIf: "{{ parameters.produto !== 'produto_a' }}"
+
+        # Campo Bravo
+        database_bravo:
+          type: string
+          title: Database do Produto Bravo
+          enum: [db_bravo_sales, db_bravo_stock]
+          ui:options:
+            # Se o produto NÃO for produto_b, o campo fica escondido
+            hideIf: "{{ parameters.produto !== 'produto_b' }}"
+
+  steps:
+    - id: disparar-n8n
+      name: Solicitando criação ao n8n
+      action: http:backstage:request
+      input:
+        method: 'POST'
+        url: 'https://seu-n8n.com/webhooks/id-do-workflow'
+        headers:
+          Content-Type: 'application/json'
+        body:
+          username: ${{ parameters.username }}
+          produto: ${{ parameters.produto }}
+          # Aqui enviamos o valor do campo que não está escondido
+          database: ${{ parameters.database_alpha if parameters.produto == 'produto_a' else parameters.database_bravo }}
+
+    - id: log-final
+      name: Concluído
+      action: debug:log 
       input:
         extra: "Solicitação enviada."
