@@ -67,7 +67,7 @@ metadata:
   description: Cria um usuário no SQL Server via n8n.
 spec:
   # O CAMPO ABAIXO É O QUE ESTÁ FALTANDO:
-  type: operation 
+  type: credentials 
   
   parameters:
     - title: Dados do Usuário
