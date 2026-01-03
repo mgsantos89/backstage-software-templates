@@ -119,9 +119,7 @@ spec:
       action: debug:log 
       input:
         extra: "Solicitação enviada."
-
 ---
-
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
