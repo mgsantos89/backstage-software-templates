@@ -64,25 +64,47 @@ kind: Template
 metadata:
   name: provisionar-sql-user
   title: Novo Usuário SQL Server
-  description: Cria um usuário no SQL Server via n8n.
 spec:
-  # O CAMPO ABAIXO É O QUE ESTÁ FALTANDO:
-  type: credentials 
-  
+  type: credential
   parameters:
-    - title: Dados do Usuário
+    - title: Seleção de Produto
       properties:
-        username:
+        produto:
           type: string
-          title: Nome do Usuário
-          description: O nome do login que será criado no SQL Server.
+          title: Em qual produto você deseja acesso?
+          enum:
+            - produto_a
+            - produto_b
+          enumNames:
+            - "Produto Alpha"
+            - "Produto Bravo"
+    
+    # Aqui começa a mágica da condicional
+    - title: Seleção de Banco de Dados
+      dependencies:
+        produto:
+          # Se o valor de 'produto' for 'produto_a'
+          produto_a:
+            properties:
+              database:
+                type: string
+                title: Database do Produto Alpha
+                enum: [db_alpha_prod, db_alpha_homolog]
+          # Se o valor de 'produto' for 'produto_b'
+          produto_b:
+            properties:
+              database:
+                type: string
+                title: Database do Produto Bravo
+                enum: [db_bravo_sales, db_bravo_stock]
   
   steps:
     - id: call-n8n
-      name: Disparando Automação no n8n
+      name: Enviando para o n8n
       action: http:backstage:request
       input:
         method: 'POST'
-        url: 'https://seu-n8n.com/webhooks/id-do-workflow'
-        headers:
-          Content-Type: 'application/json'
+        url: 'https://seu-n8n.com/webhooks/...'
+        body:
+          produto: ${{ parameters.produto }}
+          database: ${{ parameters.database }}
