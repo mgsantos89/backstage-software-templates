@@ -64,19 +64,22 @@ kind: Template
 metadata:
   name: provisionar-sql-user
   title: Novo Usuário SQL Server
+  description: Provisionamento de acesso ao SQL Server via automação n8n.
 spec:
   type: credential
-  owner: infra-team
+  owner: user:guest # Alterado para guest para evitar erro de grupo inexistente
   
+  # PASSO 1: Coleta de dados básicos
   parameters:
-    - title: Dados Básicos
+    - title: Dados do Usuário
       properties:
         username:
           type: string
           title: Nome do Usuário
-          description: Nome do login a ser criado no SQL Server.
-          
-    - title: Seleção de Ambiente
+          description: Nome do login que será criado no SQL Server.
+          ui:autofocus: true
+
+    - title: Seleção de Produto
       properties:
         produto:
           type: string
@@ -87,41 +90,52 @@ spec:
           enumNames:
             - "Produto Alpha"
             - "Produto Bravo"
-        
-        database_alpha:
+
+    # PASSO 2 (Condicional para Produto A): Só aparece se Produto Alpha for escolhido
+    - title: Seleção de Banco de Dados (Alpha)
+      if:
+        properties:
+          produto:
+            const: produto_a
+      properties:
+        database:
           type: string
           title: Database do Produto Alpha
-          enum: [db_alpha_prod, db_alpha_homolog]
-          ui:options:
-            dependencies:
-              produto: ['produto_a']
+          description: Selecione a instância de banco para o Alpha.
+          enum:
+            - db_alpha_prod
+            - db_alpha_homolog
 
-        database_bravo:
+    # PASSO 2 (Condicional para Produto B): Só aparece se Produto Bravo for escolhido
+    - title: Seleção de Banco de Dados (Bravo)
+      if:
+        properties:
+          produto:
+            const: produto_b
+      properties:
+        database:
           type: string
           title: Database do Produto Bravo
-          enum: [db_bravo_sales, db_bravo_stock]
-          ui:options:
-            dependencies:
-              produto: ['produto_b']
+          description: Selecione a instância de banco para o Bravo.
+          enum:
+            - db_bravo_sales
+            - db_bravo_stock
 
-  # ESTA É A SEÇÃO QUE ESTAVA FALTANDO:
+  # AÇÕES QUE SERÃO EXECUTADAS
   steps:
-    - id: disparar-automacao
-      name: Solicitando criação via n8n
+    - id: disparar-n8n
+      name: Solicitando criação ao n8n
       action: http:backstage:request
       input:
         method: 'POST'
-        url: 'https://seu-n8n-url.com/webhooks/id-do-workflow' # Substitua pela URL do seu n8n
+        url: 'https://seu-n8n.com/webhooks/id-do-workflow' # SUBSTITUA PELA SUA URL
         headers:
           Content-Type: 'application/json'
         body:
           username: ${{ parameters.username }}
           produto: ${{ parameters.produto }}
-          # Escolhe o banco que não estiver vazio
-          database: ${{ parameters.database_alpha or parameters.database_bravo }}
+          database: ${{ parameters.database }}
+          solicitado_por: ${{ user.entity.metadata.name }}
 
-    - id: log-sucesso
-      name: Finalizando
-      action: debug:log
-      input:
-        extra: "A solicitação para o banco ${{ parameters.database_alpha or parameters.database_bravo }} foi enviada."
+    - id: log-final
+      name: Conclu
