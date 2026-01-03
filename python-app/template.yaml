@@ -58,3 +58,41 @@ spec:
     links:
       - title: Repository
         url: ${{ steps['publish'].output.remoteUrl }}
+---
+piVersion: backstage.io/v1beta3
+kind: Template
+metadata:
+  name: provisionar-sql-user
+  title: Novo Usuário SQL Server
+  description: Cria um usuário com permissões de leitura no SQL Server via n8n.
+spec:
+  parameters:
+    - title: Dados do Usuário
+      properties:
+        username:
+          type: string
+          title: Nome do Usuário
+        db_env:
+          type: string
+          title: Ambiente
+          enum: [Produção, Homologação]
+  
+  steps:
+    - id: call-n8n
+      name: Disparando Automação no n8n
+      action: http:backstage:request
+      input:
+        method: 'POST'
+        url: 'https://seu-n8n.com/webhooks/id-do-workflow'
+        headers:
+          Content-Type: 'application/json'
+        body:
+          username: ${{ parameters.username }}
+          environment: ${{ parameters.db_env }}
+          requestedBy: ${{ user.entity.metadata.name }}
+
+    - id: log-message
+      name: Finalizado
+      action: debug:log
+      input:
+        extra: "O n8n recebeu a solicitação para o usuário ${{ parameters.username }}"
