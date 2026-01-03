@@ -66,7 +66,16 @@ metadata:
   title: Novo Usuário SQL Server
 spec:
   type: credential
+  owner: infra-team
+  
   parameters:
+    - title: Dados Básicos
+      properties:
+        username:
+          type: string
+          title: Nome do Usuário
+          description: Nome do login a ser criado no SQL Server.
+          
     - title: Seleção de Ambiente
       properties:
         produto:
@@ -79,24 +88,40 @@ spec:
             - "Produto Alpha"
             - "Produto Bravo"
         
-        # Campo para o Produto A
         database_alpha:
           type: string
-          title: Database do Produto Alpha (SQL Server)
-          enum:
-            - db_alpha_prod
-            - db_alpha_homolog
+          title: Database do Produto Alpha
+          enum: [db_alpha_prod, db_alpha_homolog]
           ui:options:
             dependencies:
-              produto: ['produto_a'] # Só aparece se produto for produto_a
+              produto: ['produto_a']
 
-        # Campo para o Produto B
         database_bravo:
           type: string
-          title: Database do Produto Bravo (SQL Server)
-          enum:
-            - db_bravo_sales
-            - db_bravo_stock
+          title: Database do Produto Bravo
+          enum: [db_bravo_sales, db_bravo_stock]
           ui:options:
             dependencies:
-              produto: ['produto_b'] # Só aparece se produto for produto_b
+              produto: ['produto_b']
+
+  # ESTA É A SEÇÃO QUE ESTAVA FALTANDO:
+  steps:
+    - id: disparar-automacao
+      name: Solicitando criação via n8n
+      action: http:backstage:request
+      input:
+        method: 'POST'
+        url: 'https://seu-n8n-url.com/webhooks/id-do-workflow' # Substitua pela URL do seu n8n
+        headers:
+          Content-Type: 'application/json'
+        body:
+          username: ${{ parameters.username }}
+          produto: ${{ parameters.produto }}
+          # Escolhe o banco que não estiver vazio
+          database: ${{ parameters.database_alpha or parameters.database_bravo }}
+
+    - id: log-sucesso
+      name: Finalizando
+      action: debug:log
+      input:
+        extra: "A solicitação para o banco ${{ parameters.database_alpha or parameters.database_bravo }} foi enviada."
